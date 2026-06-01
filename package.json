@@ -1,6 +1,6 @@
 {
-  "name": "ki-anrufagent",
-  "productName": "K!Anrufagent",
+  "name": "anrufagent",
+  "productName": "Anrufagent",
   "version": "0.1.0",
   "description": "Electron-Tool fuer AVM FRITZ!Box: zeigt eingehende Anrufe live, recherchiert den Anrufer (tellows + optional LLM), mit eigenen Markierungen, Anrufliste und Anrufbeantworter",
   "main": "main.js",

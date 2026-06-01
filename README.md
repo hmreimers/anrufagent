@@ -1,4 +1,4 @@
-# K!Anrufagent
+# Anrufagent
 
 Kleines Electron-Tool für die AVM FRITZ!Box, das eingehende Anrufe live anzeigt und
 den Anrufer automatisch gegen die Werbeanruf-Meldeseite **tellows** prueft –

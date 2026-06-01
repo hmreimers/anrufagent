@@ -17,7 +17,7 @@ function createWindow() {
     width: 480,
     height: 760,
     minWidth: 380,
-    title: 'K!Anrufagent',
+    title: 'Anrufagent',
     backgroundColor: '#11141a',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
