@@ -1,6 +1,6 @@
-# Fritz!Box Anrufmonitor
+# K!Anrufagent
 
-Kleines Electron-Tool, das eingehende Anrufe der Fritz!Box live anzeigt und
+Kleines Electron-Tool für die AVM FRITZ!Box, das eingehende Anrufe live anzeigt und
 den Anrufer automatisch gegen die Werbeanruf-Meldeseite **tellows** prueft –
 optional mit kurzer **LLM-Einschaetzung**. Alles laeuft lokal auf dem Rechner.
 

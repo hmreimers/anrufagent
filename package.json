@@ -1,7 +1,8 @@
 {
-  "name": "fritz-anrufmonitor",
+  "name": "ki-anrufagent",
+  "productName": "K!Anrufagent",
   "version": "0.1.0",
-  "description": "Electron-Tool: zeigt eingehende Fritz!Box-Anrufe und prueft den Anrufer auf Werbeanruf-Meldeseiten (tellows) plus optionale LLM-Einschaetzung",
+  "description": "Electron-Tool fuer AVM FRITZ!Box: zeigt eingehende Anrufe live, recherchiert den Anrufer (tellows + optional LLM), mit eigenen Markierungen, Anrufliste und Anrufbeantworter",
   "main": "main.js",
   "author": "Henning",
   "license": "MIT",
