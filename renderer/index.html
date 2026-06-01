@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:; media-src 'self' file:;" />
+  <title>Fritz!Box Anrufmonitor</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">&#9742;</span>
+      <span>Anrufmonitor</span>
+    </div>
+    <div class="status" id="status">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">verbinde&hellip;</span>
+    </div>
+    <button class="icon-btn" id="settingsBtn" title="Einstellungen">&#9881;</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="live">Live</button>
+    <button class="tab" data-tab="verlauf">Verlauf</button>
+    <button class="tab" data-tab="ab">Anrufbeantworter</button>
+  </nav>
+
+  <!-- LIVE -->
+  <div class="view active" id="view-live">
+    <section class="hint">
+      Call Monitor an der Fritz!Box aktiv? Einmalig <code>#96*5*</code> am Telefon waehlen.
+    </section>
+    <section class="manual">
+      <input type="text" id="manualInput" placeholder="Nummer manuell pruefen, z.B. 030123456" />
+      <button id="manualBtn">Pruefen</button>
+    </section>
+    <main id="calls">
+      <p class="empty" id="emptyState">Warte auf Anrufe&hellip;</p>
+    </main>
+  </div>
+
+  <!-- VERLAUF -->
+  <div class="view" id="view-verlauf">
+    <section class="toolbar">
+      <label class="check"><input type="checkbox" id="onlyToday" /> nur heute</label>
+      <button id="reloadCalls">Aktualisieren</button>
+    </section>
+    <main id="callList">
+      <p class="empty">Auf &bdquo;Aktualisieren&ldquo; klicken (braucht Fritz!Box-Benutzer in den Einstellungen).</p>
+    </main>
+  </div>
+
+  <!-- ANRUFBEANTWORTER -->
+  <div class="view" id="view-ab">
+    <section class="toolbar">
+      <span class="muted small">Experimentell &ndash; Wiedergabe ggf. an deiner Box noch zu justieren.</span>
+      <button id="reloadMsgs">Aktualisieren</button>
+    </section>
+    <main id="msgList">
+      <p class="empty">Auf &bdquo;Aktualisieren&ldquo; klicken (braucht Fritz!Box-Benutzer in den Einstellungen).</p>
+    </main>
+    <audio id="player" controls class="player hidden"></audio>
+  </div>
+
+  <!-- Kontakt-Editor -->
+  <div class="overlay hidden" id="contactPanel">
+    <div class="panel">
+      <h2>Nummer markieren</h2>
+      <label>Nummer</label>
+      <input type="text" id="cNumber" readonly />
+      <label>Name</label>
+      <input type="text" id="cName" placeholder="z.B. Hausarzt, Oma, Versicherung XY" />
+      <label>Einstufung</label>
+      <select id="cCategory"></select>
+      <label>Notiz</label>
+      <input type="text" id="cNote" placeholder="optional" />
+      <div class="panel-actions">
+        <button class="danger" id="cDelete">Loeschen</button>
+        <span style="flex:1"></span>
+        <button class="secondary" id="cCancel">Abbrechen</button>
+        <button id="cSave">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Einstellungen -->
+  <div class="overlay hidden" id="settingsPanel">
+    <div class="panel">
+      <h2>Einstellungen</h2>
+
+      <h3>Fritz!Box</h3>
+      <label>Host</label>
+      <input type="text" id="setHost" placeholder="fritz.box" />
+      <label>Call-Monitor-Port</label>
+      <input type="number" id="setPort" placeholder="1012" />
+      <label>TR-064-Port (Verlauf/AB)</label>
+      <input type="number" id="setTr064" placeholder="49000" />
+      <label>Benutzer</label>
+      <input type="text" id="setUser" placeholder="FRITZ!Box-Benutzer" />
+      <label>Passwort</label>
+      <input type="password" id="setPass" />
+
+      <h3>tellows-API (optional)</h3>
+      <label>Partner</label>
+      <input type="text" id="setPartner" />
+      <label>API-Key</label>
+      <input type="text" id="setApikey" />
+
+      <h3>LLM-Einschaetzung (optional)</h3>
+      <label>Anthropic API-Key</label>
+      <input type="password" id="setLlmKey" placeholder="leer = aus" />
+      <label>Modell</label>
+      <input type="text" id="setLlmModel" placeholder="claude-haiku-4-5" />
+
+      <div class="panel-actions">
+        <button class="secondary" id="cancelSettings">Abbrechen</button>
+        <button id="saveSettings">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "fritz-anrufmonitor",
+  "version": "0.1.0",
+  "description": "Electron-Tool: zeigt eingehende Fritz!Box-Anrufe und prueft den Anrufer auf Werbeanruf-Meldeseiten (tellows) plus optionale LLM-Einschaetzung",
+  "main": "main.js",
+  "author": "Henning",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^33.2.0"
+  }
+}

@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Build-Output
+dist/
+out/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Lokale Konfiguration / Daten (liegen in userData, nicht im Repo – hier nur sicherheitshalber)
+settings.json
+contacts.json
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
