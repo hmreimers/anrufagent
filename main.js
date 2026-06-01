@@ -113,19 +113,9 @@ ipcMain.handle('fritz:calllist', async () => {
   }
 });
 
-ipcMain.handle('fritz:messages', async () => {
+ipcMain.handle('fritz:playRecording', async (_e, recPath) => {
   try {
-    const messages = await fritz.getMessages(settings.fritzbox);
-    for (const m of messages) m.contact = contacts.getContact(m.number);
-    return { ok: true, messages };
-  } catch (e) {
-    return { ok: false, error: e.message };
-  }
-});
-
-ipcMain.handle('fritz:playMessage', async (_e, msg) => {
-  try {
-    return { ok: true, file: await fritz.downloadMessage(settings.fritzbox, msg) };
+    return { ok: true, file: await fritz.downloadRecording(settings.fritzbox, recPath) };
   } catch (e) {
     return { ok: false, error: e.message };
   }

@@ -151,6 +151,8 @@ function parseCallList(xml) {
       date: (tag(c, 'Date') || '').trim(),
       duration: (tag(c, 'Duration') || '').trim(),
       device: decodeEntities((tag(c, 'Device') || '').trim()),
+      // <Path> ist gesetzt, wenn zu diesem Anruf eine AB-Nachricht aufgenommen wurde
+      path: decodeEntities((tag(c, 'Path') || '').trim()),
     });
   }
   return calls;
@@ -166,56 +168,35 @@ async function getCallList(cfg, days = 14) {
   return parseCallList(await getText(listUrl));
 }
 
-// ---- Anrufbeantworter ----
-function parseMessages(xml) {
-  const out = [];
-  const re = /<Message>([\s\S]*?)<\/Message>/g;
-  let m;
-  while ((m = re.exec(xml))) {
-    const x = m[1];
-    out.push({
-      index: tag(x, 'Index'),
-      isNew: tag(x, 'New') === '1',
-      name: decodeEntities((tag(x, 'Name') || '').trim()),
-      number: (tag(x, 'Number') || '').trim(),
-      date: (tag(x, 'Date') || '').trim(),
-      duration: (tag(x, 'Duration') || '').trim(),
-      path: (tag(x, 'Path') || '').trim(),
-    });
-  }
-  return out;
+// ---- AB-Aufnahme zu einem Anruf abspielen ----
+
+/** Frische Download-Basis (Origin + sid) aus der CallList-URL holen. */
+async function recordingContext(cfg) {
+  const xml = await soapCall(cfg, { action: 'GetCallList' });
+  const listUrl = decodeEntities(tag(xml, 'NewCallListURL') || '');
+  if (!listUrl) throw new Error('keine CallList-URL erhalten');
+  const u = new URL(listUrl);
+  return { origin: `${u.protocol}//${u.host}`, sid: u.searchParams.get('sid') };
 }
 
-async function messagesUrl(cfg, tamIndex = 0) {
-  const xml = await soapCall(cfg, { action: 'GetMessageList', args: { NewIndex: tamIndex } });
-  const url = decodeEntities(tag(xml, 'NewURL') || '');
-  if (!url) throw new Error('keine MessageList-URL (Anrufbeantworter aktiv?)');
-  return url;
-}
-
-async function getMessages(cfg, tamIndex = 0) {
-  const url = await messagesUrl(cfg, tamIndex);
-  return parseMessages(await getText(url));
-}
-
-/** Best-effort: Audio-Download-URL aus MessageList-URL (sid) + Message-Path bauen. */
-function audioUrl(baseUrl, msgPath) {
-  const u = new URL(baseUrl);
-  const sid = u.searchParams.get('sid');
-  let p = /^https?:/i.test(msgPath)
-    ? msgPath
-    : `${u.protocol}//${u.host}${msgPath.startsWith('/') ? '' : '/'}${msgPath}`;
+/** Download-URL aus Origin + sid + dem <Path> des Anrufs bauen. */
+function buildRecordingUrl(origin, sid, recPath) {
+  let p = /^https?:/i.test(recPath)
+    ? recPath
+    : `${origin}${recPath.startsWith('/') ? '' : '/'}${recPath}`;
   if (sid && !/[?&]sid=/.test(p)) p += (p.includes('?') ? '&' : '?') + 'sid=' + sid;
   return p;
 }
 
-/** Nachricht herunterladen, in Temp-WAV schreiben, Pfad zurueckgeben. */
-async function downloadMessage(cfg, msg, tamIndex = 0) {
-  const base = await messagesUrl(cfg, tamIndex);
-  const buf = await getBinary(audioUrl(base, msg.path));
-  const tmp = path.join(os.tmpdir(), `fritz-ab-${msg.index || 'msg'}.wav`);
+/** AB-Aufnahme herunterladen, in Temp-WAV schreiben, Pfad zurueckgeben. */
+async function downloadRecording(cfg, recPath) {
+  if (!recPath) throw new Error('kein Aufnahme-Pfad');
+  const { origin, sid } = await recordingContext(cfg);
+  const buf = await getBinary(buildRecordingUrl(origin, sid, recPath));
+  const safe = recPath.replace(/[^\w]+/g, '_').slice(-48);
+  const tmp = path.join(os.tmpdir(), `anrufagent-rec-${safe}.wav`);
   fs.writeFileSync(tmp, buf);
   return tmp;
 }
 
-module.exports = { getCallList, getMessages, downloadMessage };
+module.exports = { getCallList, downloadRecording };

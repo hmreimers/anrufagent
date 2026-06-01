@@ -7,7 +7,7 @@ const path = require('path');
 const DEFAULTS = {
   // port = Call-Monitor (1012); tr064Port = TR-064 fuer Verlauf/AB (49000);
   // username/password = FRITZ!Box-Benutzer fuer TR-064.
-  fritzbox: { host: 'fritz.box', port: 1012, tr064Port: 49000, username: '', password: '' },
+  fritzbox: { host: '192.168.0.2', port: 1012, tr064Port: 49000, username: '', password: '' },
   // tellows-API: Partner-Account auf https://www.tellows.de/c/partner/ anlegen
   // und eigenen Key eintragen. Die Test-Credentials sind oft stark limitiert.
   tellows: { partner: 'test', apikey: 'test123' },

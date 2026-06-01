@@ -6,9 +6,15 @@ optional mit kurzer **LLM-Einschaetzung**. Alles laeuft lokal auf dem Rechner.
 
 ## Funktionsweise
 
-Die Fritz!Box hat einen **Call Monitor**: einen TCP-Stream auf Port `1012`,
+Die FRITZ!Box hat einen **Call Monitor**: einen TCP-Stream auf Port `1012`,
 der bei jedem Klingeln eine Textzeile mit der Anrufernummer pusht. Das Tool
 liest diesen Stream, parst die `RING`-Ereignisse und recherchiert die Nummer.
+
+Zusaetzlich (Tab **Verlauf**) wird die Anrufliste der FRITZ!Box per **TR-064**
+geladen. Anrufe mit einer aufgenommenen **Anrufbeantworter-Nachricht** werden
+markiert und lassen sich direkt in der Liste abspielen. Nummern kann man mit
+**Name und Einstufung** (Serioes / Werbung / Verdaechtig / Spam …) markieren;
+die Markierung erscheint dann bei jedem weiteren Anruf.
 
 ## Einrichtung
 
@@ -23,7 +29,10 @@ liest diesen Stream, parst die `RING`-Ereignisse und recherchiert die Nummer.
    ```
 
 3. In den **Einstellungen** (Zahnrad) eintragen:
-   - **Fritz!Box Host**: meist `fritz.box` oder `192.168.178.1`
+   - **Host**: IP der FRITZ!Box (z. B. `192.168.0.2` oder `fritz.box`)
+   - **Benutzer + Passwort**: ein FRITZ!Box-Benutzer (fuer Verlauf/AB via TR-064).
+     An der Box: „Heimnetz > Netzwerk > Netzwerkeinstellungen > Zugriff fuer
+     Anwendungen zulassen" aktivieren.
    - **tellows Partner / API-Key**: eigenen Partner-Account auf
      <https://www.tellows.de/c/partner/> anlegen. Die voreingestellten
      Test-Credentials (`test` / `test123`) sind oft stark limitiert.
@@ -45,5 +54,7 @@ liest diesen Stream, parst die `RING`-Ereignisse und recherchiert die Nummer.
 | `main.js` | Electron-Hauptprozess, verdrahtet Monitor + Recherche + IPC |
 | `src/callmonitor.js` | TCP-Client + Parser fuer den Call Monitor |
 | `src/lookup.js` | tellows-Abfrage + optionale LLM-Einschaetzung |
+| `src/fritzbox.js` | TR-064: Anrufliste + AB-Aufnahme-Download |
+| `src/contacts.js` | lokale Markierungen/Namen (userData) |
 | `src/settings.js` | Einstellungen laden/speichern (userData) |
 | `renderer/` | UI (HTML/CSS/JS) |

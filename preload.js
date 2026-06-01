@@ -19,10 +19,9 @@ contextBridge.exposeInMainWorld('api', {
   saveContact: (number, data) => ipcRenderer.invoke('contacts:save', { number, data }),
   deleteContact: (n) => ipcRenderer.invoke('contacts:delete', n),
 
-  // Fritz!Box: Verlauf + Anrufbeantworter
+  // Fritz!Box: Verlauf + AB-Aufnahmen
   callList: () => ipcRenderer.invoke('fritz:calllist'),
-  messages: () => ipcRenderer.invoke('fritz:messages'),
-  playMessage: (msg) => ipcRenderer.invoke('fritz:playMessage', msg),
+  playRecording: (recPath) => ipcRenderer.invoke('fritz:playRecording', recPath),
 
   openExternal: (u) => ipcRenderer.invoke('open:external', u),
 });

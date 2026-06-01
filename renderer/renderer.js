@@ -181,6 +181,7 @@ manualInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') runManua
 // =====================================================================
 const callListEl = document.getElementById('callList');
 const onlyToday = document.getElementById('onlyToday');
+const player = document.getElementById('player');
 let lastCalls = [];
 
 const CALL_TYPE = {
@@ -206,15 +207,31 @@ function renderCalls() {
     const meta = CALL_TYPE[c.type] || { ico: '•', txt: 'Anruf', cls: '' };
     const num = c.type === 3 ? c.called : c.caller;
     const name = (c.contact && c.contact.name) || c.name || '';
+    const hasMsg = !!c.path;
     const el = document.createElement('div');
     el.className = `item ${meta.cls}`;
     el.innerHTML = `
       <span class="ico">${meta.ico}</span>
       <div class="body">
-        <div class="title">${escapeHtml(name || num || 'Unbekannt')} ${contactBadge(c.contact)}</div>
+        <div class="title">${escapeHtml(name || num || 'Unbekannt')} ${contactBadge(c.contact)} ${hasMsg ? '<span class="tag-new">✉ Nachricht</span>' : ''}</div>
         <div class="sub">${escapeHtml(num)} &middot; ${escapeHtml(meta.txt)} &middot; ${escapeHtml(c.date)}${c.duration && c.duration !== '0:00' ? ' &middot; ' + escapeHtml(c.duration) : ''}</div>
       </div>
-      <button class="edit-btn" title="markieren">✎</button>`;
+      <div class="actions">
+        ${hasMsg ? '<button class="mini play" title="Nachricht abspielen">▶</button>' : ''}
+        <button class="edit-btn" title="markieren">✎</button>
+      </div>`;
+    if (hasMsg) {
+      el.querySelector('.play').addEventListener('click', async (ev) => {
+        const btn = ev.target;
+        btn.textContent = '…';
+        const r = await window.api.playRecording(c.path);
+        if (!r.ok) { btn.textContent = '▶'; alert('Wiedergabe fehlgeschlagen: ' + r.error); return; }
+        player.src = 'file:///' + r.file.replace(/\\/g, '/');
+        player.classList.remove('hidden');
+        player.play().catch(() => {});
+        btn.textContent = '▶';
+      });
+    }
     el.querySelector('.edit-btn').addEventListener('click', () => openEditor(num));
     callListEl.appendChild(el);
   }
@@ -232,53 +249,6 @@ async function loadCalls() {
 }
 document.getElementById('reloadCalls').addEventListener('click', loadCalls);
 onlyToday.addEventListener('change', renderCalls);
-
-// =====================================================================
-// ANRUFBEANTWORTER
-// =====================================================================
-const msgListEl = document.getElementById('msgList');
-const player = document.getElementById('player');
-
-async function loadMessages() {
-  msgListEl.innerHTML = `<p class="empty">lade Nachrichten…</p>`;
-  const res = await window.api.messages();
-  if (!res.ok) {
-    msgListEl.innerHTML = `<p class="empty err">Fehler: ${escapeHtml(res.error)}</p>`;
-    return;
-  }
-  if (!res.messages.length) {
-    msgListEl.innerHTML = `<p class="empty">Keine Nachrichten.</p>`;
-    return;
-  }
-  msgListEl.innerHTML = '';
-  for (const m of res.messages) {
-    const name = (m.contact && m.contact.name) || m.name || m.number || 'Unbekannt';
-    const el = document.createElement('div');
-    el.className = 'item';
-    el.innerHTML = `
-      <span class="ico">☎</span>
-      <div class="body">
-        <div class="title">${escapeHtml(name)} ${m.isNew ? '<span class="tag-new">NEU</span>' : ''} ${contactBadge(m.contact)}</div>
-        <div class="sub">${escapeHtml(m.number)} &middot; ${escapeHtml(m.date)} &middot; ${escapeHtml(m.duration)}</div>
-      </div>
-      <div class="actions">
-        <button class="mini play">▶ Abspielen</button>
-        <button class="edit-btn" title="markieren">✎</button>
-      </div>`;
-    el.querySelector('.play').addEventListener('click', async (ev) => {
-      ev.target.textContent = '… lade';
-      const r = await window.api.playMessage(m);
-      if (!r.ok) { ev.target.textContent = 'Fehler'; alert('Wiedergabe fehlgeschlagen: ' + r.error); return; }
-      player.src = 'file:///' + r.file.replace(/\\/g, '/');
-      player.classList.remove('hidden');
-      player.play().catch(() => {});
-      ev.target.textContent = '▶ Abspielen';
-    });
-    el.querySelector('.edit-btn').addEventListener('click', () => openEditor(m.number));
-    msgListEl.appendChild(el);
-  }
-}
-document.getElementById('reloadMsgs').addEventListener('click', loadMessages);
 
 // =====================================================================
 // KONTAKT-EDITOR
